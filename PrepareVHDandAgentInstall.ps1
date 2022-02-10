@@ -128,6 +128,10 @@ Write-Host "Installing VM agent" -ForegroundColor red -BackgroundColor white
 # Install
 C:\agent.msi /quiet
 
+#Wait for 30 seconds to allow the Azure VM agent to install
+Write-Host "Waiting for agent to complete installation" -ForegroundColor red -BackgroundColor white
+Start-Sleep -s 30
+
 Write-Host "Removing agent installer" -ForegroundColor red -BackgroundColor white
 $AgentExists = "C:\agent.msi"
 $FileExists = Test-Path $AgentExists
