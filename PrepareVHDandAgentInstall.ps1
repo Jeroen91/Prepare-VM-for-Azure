@@ -120,7 +120,7 @@ Write-Host "Find latest version" -ForegroundColor red -BackgroundColor white
 # Find latest installer
 $url = 'https://github.com/Azure/WindowsVMAgent/releases'
 $site = Invoke-WebRequest -UseBasicParsing -Uri $url
-$table = $site.links | ?{ $_.tagName -eq 'A' -and $_.href.ToLower().Contains('windowsazurevmagent') -and $_.href.ToLower().EndsWith("msi") } | sort href -desc | select href -first 1
+$table = $site.links | ?{ $_.tagName -eq 'A' -and $_.href.ToLower().Contains('windowsazurevmagent') -and $_.href.ToLower().Contains('amd64') -and $_.href.ToLower().EndsWith("msi") } | sort href -desc | select href -first 1
 $filename = $table.href.ToString()
 
 Write-Host "Download latest installer" -ForegroundColor red -BackgroundColor white
