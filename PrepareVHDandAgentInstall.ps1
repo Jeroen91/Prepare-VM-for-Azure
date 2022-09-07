@@ -63,7 +63,7 @@ Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled True
 
 Write-Host "Allow WinRM through the three firewall profiles (domain, private, and public), and enable the PowerShell remote service." -ForegroundColor red -BackgroundColor white
 Enable-PSRemoting -Force
-Set-NetFirewallRule -Name WINRM-HTTP-In-TCP, WINRM-HTTP-In-TCP-PUBLIC -Enabled True
+Set-NetFirewallRule -Group '@FirewallAPI.dll,-30267' -Enabled True
 
 Write-Host "Enable the following firewall rules to allow the RDP traffic." -ForegroundColor red -BackgroundColor white
 Set-NetFirewallRule -Group '@FirewallAPI.dll,-28752' -Enabled True
