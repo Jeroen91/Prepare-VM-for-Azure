@@ -118,14 +118,15 @@ Else {Write-Host "Nothing to remove" -ForegroundColor red -BackgroundColor white
 
 Write-Host "Find latest version" -ForegroundColor red -BackgroundColor white
 # Find latest installer
-$url = 'https://github.com/Azure/WindowsVMAgent/releases'
-$site = Invoke-WebRequest -UseBasicParsing -Uri $url
-$table = $site.links | ?{ $_.tagName -eq 'A' -and $_.href.ToLower().Contains('windowsazurevmagent') -and $_.href.ToLower().Contains('amd64') -and $_.href.ToLower().EndsWith("msi") } | sort href -desc | select href -first 1
-$filename = $table.href.ToString()
-
+$repo = "Azure/WindowsVMAgent"
+$releases = "https://api.github.com/repos/$repo/releases/latest"
+Write-Host "Determining latest release" -ForegroundColor red -BackgroundColor white
+$id = ((Invoke-WebRequest $releases | ConvertFrom-Json).assets | where { $_.name.ToLower().contains("amd64") -and $_.name.ToLower().EndsWith("msi") -and $_.name.ToLower().Contains('windowsazurevmagent') }).id
+$asset_url = "https://api.github.com/repos/$repo/releases/assets/$id"
+$download_url = (Invoke-WebRequest $asset_url | ConvertFrom-Json).browser_download_url
 Write-Host "Download latest installer" -ForegroundColor red -BackgroundColor white
 # Download installer
-$src = "https://github.com" + $filename
+$src = $download_url
 Invoke-WebRequest $src -OutFile C:\agent.msi
 
 Write-Host "Installing VM agent" -ForegroundColor red -BackgroundColor white
