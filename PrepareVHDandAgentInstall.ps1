@@ -121,9 +121,9 @@ Write-Host "Find latest version" -ForegroundColor red -BackgroundColor white
 $repo = "Azure/WindowsVMAgent"
 $releases = "https://api.github.com/repos/$repo/releases/latest"
 Write-Host "Determining latest release" -ForegroundColor red -BackgroundColor white
-$id = ((Invoke-WebRequest $releases | ConvertFrom-Json).assets | where { $_.name.ToLower().contains("amd64") -and $_.name.ToLower().EndsWith("msi") -and $_.name.ToLower().Contains('windowsazurevmagent') }).id
+$id = ((Invoke-WebRequest $releases -UseBasicParsing | ConvertFrom-Json).assets | where { $_.name.ToLower().contains("amd64") -and $_.name.ToLower().EndsWith("msi") -and $_.name.ToLower().Contains('windowsazurevmagent') }).id
 $asset_url = "https://api.github.com/repos/$repo/releases/assets/$id"
-$download_url = (Invoke-WebRequest $asset_url | ConvertFrom-Json).browser_download_url
+$download_url = (Invoke-WebRequest $asset_url -UseBasicParsing | ConvertFrom-Json).browser_download_url
 Write-Host "Download latest installer" -ForegroundColor red -BackgroundColor white
 # Download installer
 $src = $download_url
@@ -133,9 +133,18 @@ Write-Host "Installing VM agent" -ForegroundColor red -BackgroundColor white
 # Install
 C:\agent.msi /quiet
 
-#Wait for 30 seconds to allow the Azure VM agent to install
+#Checking if Agent is installed and service is registered
 Write-Host "Waiting for agent to complete installation" -ForegroundColor red -BackgroundColor white
-Start-Sleep -s 30
+do{ $service = Get-Service -Name WindowsAzureGuestAgent -ErrorAction SilentlyContinue
+    if($service -eq $null)
+    {
+        Write-Host "Agent service not registered yet, waitting 10 seconds...."
+        Sleep 10
+    } else { 
+        Write-Host "Agent service registered, continuing..." 
+    }
+} While ($service -eq $null)
+
 
 Write-Host "Removing agent installer" -ForegroundColor red -BackgroundColor white
 $AgentExists = "C:\agent.msi"
